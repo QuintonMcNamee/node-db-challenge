@@ -27,7 +27,13 @@ function addProject(project) {
 };
 
 function retrieveProjects() {
-    return db('projects');
+    return db('projects')
+        .then(projects => {
+            return projects.map(project => {
+                project.completed = project.completed ? true : false;
+                return project;
+            });
+        });
 };
 
 function resourceId(id) {
@@ -63,5 +69,13 @@ function addTask(task) {
 };
 
 function retrieveTasks() {
-    return db('tasks');
+    return db('tasks')
+        .join('projects', 'projects.id', '=', 'tasks.project_id')
+        .select('tasks.id', 'projects.name as project_name', 'projects.description as project_description', 'tasks.description as task_description', 'tasks.notes', 'tasks.completed')
+        .then(tasks => {
+            return tasks.map(task => {
+                task.completed = task.completed ? true : false;
+                return task;
+            });
+        });
 };
